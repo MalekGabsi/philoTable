@@ -11,11 +11,13 @@ public class ChopStick {
 
     synchronized public void take() throws InterruptedException {
         while (!iAmFree) {
-            wait();
+            wait(5000);
+            //return false
         }
         // assert iAmFree;
         iAmFree = false;
         System.out.println("baguette " + myNumber + " prise");
+        //return true
         // Pas utile de faire notifyAll ici, personne n'attend qu'elle soit occupée
     }
 
