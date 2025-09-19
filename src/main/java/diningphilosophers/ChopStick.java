@@ -11,7 +11,7 @@ public class ChopStick {
 
     synchronized public void take() throws InterruptedException {
         while (!iAmFree) {
-            wait(5000);
+            wait();
             //return false
         }
         // assert iAmFree;
@@ -32,5 +32,8 @@ public class ChopStick {
     public String toString() {
         return "baguette #" + myNumber;
     }
+    public synchronized boolean isFree() {
+    return iAmFree;
+}
     
 }
