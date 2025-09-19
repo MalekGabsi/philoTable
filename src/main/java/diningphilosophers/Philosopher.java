@@ -30,7 +30,7 @@ public class Philosopher extends Thread {
 
     @Override
     public void run() {
-        while (running) {
+        /* while (running) {
             try {
                 think();
                 // Aléatoirement prendre la baguette de gauche puis de droite ou l'inverse
@@ -54,9 +54,57 @@ public class Philosopher extends Thread {
             } catch (InterruptedException ex) {
                 Logger.getLogger("Table").log(Level.SEVERE, "{0} Interrupted", this.getName());
             }
+        } */
+
+         Random random = new Random();
+    while (running) {
+        try {
+            think();
+
+            boolean hasLeft = false;
+            boolean hasRight = false;
+
+            while (running) {
+                synchronized (myLeftStick) {
+                    if (myLeftStick.isFree()) {
+                        myLeftStick.take();
+                        hasLeft = true;
+                    }
+                }
+
+                synchronized (myRightStick) {
+                    if (myRightStick.isFree()) {
+                        myRightStick.take();
+                        hasRight = true;
+                    }
+                }
+
+                if (hasLeft && hasRight) {
+                    // Les deux baguettes sont prises : on peut manger
+                    eat();
+                    myLeftStick.release();
+                    myRightStick.release();
+                    break; // sortir de la boucle et recommencer
+                } else {
+                    // Échec → relâcher ce qu'on a et attendre un peu
+                    if (hasLeft) {
+                        myLeftStick.release();
+                        hasLeft = false;
+                    }
+                    if (hasRight) {
+                        myRightStick.release();
+                        hasRight = false;
+                    }
+                    Thread.sleep(random.nextInt(500)); // attendre un peu avant de réessayer
+                }
+            }
+
+        } catch (InterruptedException ex) {
+            Logger.getLogger("Table").log(Level.SEVERE, "{0} Interrupted", this.getName());
         }
     }
-
+    }
+    
     // Permet d'interrompre le philosophe "proprement" :
     // Il relachera ses baguettes avant de s'arrêter
     public void leaveTable() {
